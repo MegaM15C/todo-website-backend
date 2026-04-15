@@ -5,15 +5,26 @@ import { apiReference } from '@scalar/nestjs-api-reference';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import * as fs from 'fs';
 
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    cors: {
-      credentials: true,
-      origin: ['http://localhost:3000', 'http://127.0.0.1:3000']
+
+  const httpsOptions = {
+    key: fs.readFileSync('./localhost+2-key.pem'),
+    cert: fs.readFileSync('./localhost+2.pem'),
+  };
+
+  const app = await NestFactory.create<NestExpressApplication>(
+    AppModule,
+    {
+      httpsOptions,
+      cors: {
+        origin: 'http://localhost:3000',
+        credentials: true,
+      },
     },
-  });
+  );
   app.use(cookieParser())
 
   app.useGlobalPipes(
